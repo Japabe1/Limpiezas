@@ -670,6 +670,219 @@ function exportToExcel() {
 }
 
 // ============================================
+// EXPORTAR A PDF (PRÓXIMO VIERNES)
+// ============================================
+function getNextFriday() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day
+
+    const dayOfWeek = today.getDay(); // 0 = Sunday, 5 = Friday
+    let daysUntilFriday = (5 - dayOfWeek + 7) % 7;
+
+    // Si es viernes (dayOfWeek === 5), daysUntilFriday será 0
+    // Si queremos el viernes actual si es viernes, o el próximo si no lo es
+    if (daysUntilFriday === 0) {
+        // Es viernes hoy, usar hoy
+        const now = new Date();
+        if (now.getHours() >= 21) {
+            // Si ya pasaron las 21:00, usar el próximo viernes
+            daysUntilFriday = 7;
+        }
+    }
+
+    const nextFriday = new Date(today);
+    nextFriday.setDate(today.getDate() + daysUntilFriday);
+
+    return dateToStr(nextFriday);
+}
+
+async function exportNextFridayToPDF() {
+    try {
+        // Obtener el próximo viernes
+        const nextFriday = getNextFriday();
+
+        // Cargar reservas de esa fecha
+        await loadBookings(nextFriday);
+        const bookings = getBookingsForDate(nextFriday);
+
+        if (bookings.length === 0) {
+            alert(`No hay reservas para el próximo viernes (${formatDateLong(nextFriday)})`);
+            return;
+        }
+
+        // Inicializar jsPDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Configuración
+        const pageWidth = doc.internal.pageSize.width;
+        const pageHeight = doc.internal.pageSize.height;
+        const margin = 20;
+        let yPos = 20;
+
+        // ============================================
+        // ENCABEZADO
+        // ============================================
+        doc.setFontSize(20);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(33, 37, 41); // Color oscuro
+        doc.text('Sistema de Reservas', pageWidth / 2, yPos, { align: 'center' });
+        yPos += 8;
+
+        doc.setFontSize(16);
+        doc.setTextColor(108, 117, 125); // Color gris
+        doc.text('Higiene Bucodental - Prácticas DAVANTE', pageWidth / 2, yPos, { align: 'center' });
+        yPos += 15;
+
+        // Línea separadora
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, yPos, pageWidth - margin, yPos);
+        yPos += 10;
+
+        // ============================================
+        // INFORMACIÓN DE LA FECHA
+        // ============================================
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(33, 37, 41);
+        doc.text(`Reservas para: ${formatDateLong(nextFriday)}`, margin, yPos);
+        yPos += 10;
+
+        // ============================================
+        // RESUMEN DE OCUPACIÓN
+        // ============================================
+        const slots = generateTimeSlots();
+        const totalPlaces = slots.length * CONFIG.CHAIRS.length;
+        const occupied = bookings.length;
+        const available = totalPlaces - occupied;
+
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(108, 117, 125);
+        doc.text(`Total de plazas: ${totalPlaces} | Ocupadas: ${occupied} | Disponibles: ${available}`, margin, yPos);
+        yPos += 15;
+
+        // ============================================
+        // TABLA DE RESERVAS
+        // ============================================
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(33, 37, 41);
+
+        // Anchos de columnas
+        const colWidths = [35, 30, 55, 60];
+        const headers = ['Horario', 'Sillón', 'Paciente', 'Email'];
+        let xPos = margin;
+
+        // Encabezados de tabla
+        headers.forEach((header, i) => {
+            doc.text(header, xPos, yPos);
+            xPos += colWidths[i];
+        });
+
+        yPos += 2;
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, yPos, pageWidth - margin, yPos);
+        yPos += 6;
+
+        // Ordenar reservas por slot_index
+        const sortedBookings = [...bookings].sort((a, b) => a.slot_index - b.slot_index);
+
+        // Datos de la tabla
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(9);
+
+        sortedBookings.forEach((booking, index) => {
+            // Verificar si necesitamos una nueva página
+            if (yPos > pageHeight - 30) {
+                doc.addPage();
+                yPos = 20;
+
+                // Repetir encabezados en nueva página
+                doc.setFont(undefined, 'bold');
+                doc.setFontSize(10);
+                xPos = margin;
+                headers.forEach((header, i) => {
+                    doc.text(header, xPos, yPos);
+                    xPos += colWidths[i];
+                });
+                yPos += 2;
+                doc.line(margin, yPos, pageWidth - margin, yPos);
+                yPos += 6;
+                doc.setFont(undefined, 'normal');
+                doc.setFontSize(9);
+            }
+
+            xPos = margin;
+
+            // Alternar color de fondo para filas
+            if (index % 2 === 0) {
+                doc.setFillColor(248, 249, 250);
+                doc.rect(margin - 2, yPos - 5, pageWidth - 2 * margin + 4, 7, 'F');
+            }
+
+            // Horario
+            doc.setTextColor(33, 37, 41);
+            doc.text(booking.time_slot, xPos, yPos);
+            xPos += colWidths[0];
+
+            // Sillón con color
+            const chairColors = {
+                rojo: [220, 53, 69],
+                azul: [13, 110, 253],
+                amarillo: [255, 193, 7]
+            };
+            const chairText = booking.chair.charAt(0).toUpperCase() + booking.chair.slice(1);
+            doc.setTextColor(...chairColors[booking.chair]);
+            doc.text(`● ${chairText}`, xPos, yPos);
+            xPos += colWidths[1];
+
+            // Paciente
+            doc.setTextColor(33, 37, 41);
+            doc.text(booking.patient_name, xPos, yPos);
+            xPos += colWidths[2];
+
+            // Email
+            doc.setTextColor(108, 117, 125);
+            doc.text(booking.patient_email, xPos, yPos);
+
+            yPos += 7;
+        });
+
+        // ============================================
+        // PIE DE PÁGINA
+        // ============================================
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(128, 128, 128);
+
+            // Línea superior del pie
+            doc.setDrawColor(200, 200, 200);
+            doc.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+
+            // Texto del pie
+            const footerText = `Generado el ${new Date().toLocaleString('es-ES')} - Página ${i} de ${pageCount}`;
+            doc.text(footerText, pageWidth / 2, pageHeight - 10, { align: 'center' });
+        }
+
+        // ============================================
+        // DESCARGAR PDF
+        // ============================================
+        const fileName = `reservas_${nextFriday}.pdf`;
+        doc.save(fileName);
+
+        alert(`✅ PDF generado correctamente\n\nArchivo: ${fileName}\nReservas incluidas: ${bookings.length}`);
+
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error al generar el PDF: ' + error.message);
+    }
+}
+
+
+// ============================================
 // RESET DE RESERVAS
 // ============================================
 async function resetAllBookings() {
@@ -751,6 +964,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Event listeners - Admin
     document.getElementById('btnExport').addEventListener('click', exportToExcel);
+    document.getElementById('btnExportPDF').addEventListener('click', exportNextFridayToPDF);
     document.getElementById('btnResetAll').addEventListener('click', resetAllBookings);
     document.getElementById('btnResetDate').addEventListener('click', resetDateBookings);
     document.getElementById('saveEditBooking').addEventListener('click', saveEditBooking);

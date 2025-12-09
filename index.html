@@ -17,6 +17,9 @@
   <!-- SheetJS (para exportar Excel) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
+  <!-- jsPDF (para exportar PDF) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -166,6 +169,7 @@
             <h4 class="mb-0">📋 Todas las Reservas</h4>
             <div class="d-flex gap-2">
               <button class="btn btn-success" id="btnExport">📥 Exportar Excel</button>
+              <button class="btn btn-primary" id="btnExportPDF">📄 Exportar PDF (Próximo Viernes)</button>
               <button class="btn btn-warning" id="btnResetDate">🗑️ Reset por Fecha</button>
               <button class="btn btn-danger" id="btnResetAll">⚠️ Reset Total</button>
             </div>
