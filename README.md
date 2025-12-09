@@ -1,270 +1,304 @@
 # Sistema de Reservas - Higiene Bucodental
 
-Sistema completo de gestión de citas con vista de usuario y panel de administrador.
+Sistema profesional de gestión de reservas para prácticas de Higiene Bucodental con backend PHP + MySQL.
 
----
+## 🎯 Características
 
-## 📁 Archivos del Sistema
+### Vista de Usuario
+- 📅 Calendario interactivo (solo viernes)
+- 🕐 Selección de horarios (15:15 - 20:30, intervalos de 40 min)
+- 💺 Tres sillones disponibles (rojo, azul, amarillo)
+- ✉️ Validación de email (@alu.medac.es, @medac.es)
+- ❌ Cancelación de citas por email
+- 📱 Diseño responsive
+
+### Panel de Administrador
+- 🔐 Autenticación segura con sesiones
+- 📊 Estadísticas de reservas
+- ✏️ Editar cualquier cita
+- 🗑️ Eliminar citas individuales o masivas
+- 📥 Exportar a Excel
+- 🔄 Reset de reservas por fecha o total
+- 📝 Registro de auditoría
+
+## 🏗️ Arquitectura
+
+### Frontend
+- HTML5 + CSS3 + JavaScript (ES6+)
+- Bootstrap 5.3.2
+- SheetJS (exportación Excel)
+- Fetch API para comunicación con backend
+
+### Backend
+- PHP 7.4+ / 8.x
+- MySQL 5.7+ / MariaDB
+- PDO para acceso a base de datos
+- API REST con JSON
+- Sesiones seguras
+
+### Base de Datos
+- **users**: Administradores
+- **bookings**: Reservas
+- **audit_log**: Registro de cambios
+- Triggers automáticos para auditoría
+- Índices optimizados para rendimiento
+
+## 📁 Estructura del Proyecto
 
 ```
 Limpiezas/
-├── index.html          ← Vista de Usuario (con admin integrado)
-├── admin.html          ← Panel de Administrador Independiente ⭐
-├── styles.css          ← Estilos compartidos
-├── app.js              ← Lógica de index.html
-├── INSTRUCCIONES.md    ← Guía de personalización
-└── README.md           ← Este archivo
+├── index.html              # Interfaz principal
+├── admin.html              # Panel admin standalone (legacy)
+├── styles.css              # Estilos personalizados
+├── app.js                  # Frontend con localStorage (legacy)
+├── app-api.js              # Frontend con API (nuevo)
+├── api/
+│   ├── config.php          # Configuración
+│   ├── database.php        # Conexión BD
+│   ├── auth.php            # Autenticación
+│   ├── bookings.php        # CRUD reservas
+│   └── utils.php           # Funciones auxiliares
+├── sql/
+│   └── setup.sql           # Script de instalación
+├── DEPLOYMENT.md           # Guía de despliegue
+├── README.md               # Este archivo
+└── INSTRUCCIONES.md        # Instrucciones originales
 ```
 
----
+## 🚀 Instalación Rápida
 
-## 🚀 Inicio Rápido
+### Requisitos
+- XAMPP (Apache + MySQL + PHP)
+- Navegador moderno
 
-### Para Usuarios (Reservar Citas)
+### Pasos
 
-1. Abre **`index.html`** en tu navegador
-2. Selecciona un viernes en el calendario
-3. Elige un horario y sillón disponible
-4. Completa el formulario con tus datos
-5. ¡Listo! Tu cita está reservada
+1. **Copiar archivos**
+   ```bash
+   # Copiar carpeta a htdocs
+   C:\xampp\htdocs\Limpiezas\
+   ```
 
-### Para Administradores
+2. **Iniciar XAMPP**
+   - Iniciar Apache
+   - Iniciar MySQL
 
-**Opción 1: Panel Independiente (Recomendado) ⭐**
-1. Abre **`admin.html`** en tu navegador
-2. Introduce la clave: `admin123`
-3. Gestiona todas las reservas desde el panel
+3. **Crear base de datos**
+   - Abrir phpMyAdmin: `http://localhost/phpmyadmin`
+   - Importar `sql/setup.sql`
 
-**Opción 2: Desde Vista de Usuario**
-1. Abre **`index.html`**
-2. Haz clic en "🔐 Modo Administrador"
-3. Introduce la clave: `admin123`
+4. **Acceder**
+   - URL: `http://localhost/Limpiezas/`
+   - Admin: `admin` / `admin123`
 
----
+📖 **Ver [DEPLOYMENT.md](DEPLOYMENT.md) para instrucciones detalladas**
 
-## 🎯 Características Principales
+## 🔌 API Endpoints
 
-### Vista de Usuario (index.html)
+### Autenticación
 
-✅ **Calendario interactivo** - Solo viernes seleccionables  
-✅ **Horarios dinámicos** - 15:15 a 20:30 (intervalos de 40 min)  
-✅ **Tres sillones** - Rojo, azul y amarillo con colores distintivos  
-✅ **Reserva fácil** - Formulario simple con nombre y teléfono  
-✅ **Cancelación** - Elimina tus citas con tu número de teléfono  
-✅ **Estadísticas** - Ve disponibilidad en tiempo real  
+```http
+POST /api/auth.php?action=login
+Content-Type: application/json
 
-### Panel de Administrador (admin.html)
-
-🔐 **Autenticación segura** - Modal de login al cargar  
-📊 **Dashboard completo** - 4 tarjetas de estadísticas  
-🔍 **Filtros avanzados** - Busca por nombre, teléfono, sillón o fecha  
-✏️ **Edición total** - Modifica fecha, hora, sillón, nombre y teléfono  
-🗑️ **Eliminación** - Borra reservas individuales  
-📥 **Exportar Excel** - Descarga todas las reservas  
-⚠️ **Reset flexible** - Por fecha específica o total  
-
----
-
-## 📊 Comparación de Opciones
-
-| Característica | index.html | admin.html |
-|---------------|------------|------------|
-| **Vista Usuario** | ✅ | ❌ |
-| **Vista Admin** | ✅ Integrada | ✅ Dedicada |
-| **Autenticación** | Prompt simple | Modal profesional |
-| **Estadísticas** | 2 básicas | 4 completas |
-| **Filtros** | ❌ | ✅ 4 filtros |
-| **Editar fecha/hora** | ❌ | ✅ |
-| **Diseño admin** | Compartido | Profesional |
-| **Uso recomendado** | Usuarios finales | Administradores |
-
----
-
-## 💾 Persistencia de Datos
-
-- **Almacenamiento**: localStorage del navegador
-- **Clave**: `bookings_v2`
-- **Compartido**: Ambos archivos usan los mismos datos
-- **Backup**: Exporta a Excel regularmente
-
-⚠️ **Importante**: Los datos se guardan localmente en el navegador. Si cambias de navegador o computadora, no verás las mismas reservas.
-
----
-
-## 🔧 Configuración
-
-### Cambiar Clave de Administrador
-
-**En index.html:**
-- Edita `app.js`, línea 6
-- Cambia `ADMIN_PASSWORD: 'admin123'`
-
-**En admin.html:**
-- Edita `admin.html`, línea 296
-- Cambia `ADMIN_PASSWORD: 'admin123'`
-
-### Cambiar Horarios
-
-Edita `app.js` (o `admin.html` líneas 298-299):
-```javascript
-START_TIME: { h: 15, m: 15 },  // Hora inicio
-END_TIME: { h: 20, m: 30 },    // Hora fin
+{
+  "username": "admin",
+  "password": "admin123"
+}
 ```
 
-### Cambiar Duración de Citas
-
-Edita `app.js` (o `admin.html` línea 297):
-```javascript
-SLOT_DURATION_MIN: 40,  // Minutos por cita
+```http
+GET /api/auth.php?action=check
 ```
 
----
+```http
+GET /api/auth.php?action=logout
+```
 
-## 📖 Documentación Completa
+### Reservas
 
-- **INSTRUCCIONES.md** - Guía completa de personalización
-- **walkthrough.md** - Demostración de funcionalidades
-- **admin_walkthrough.md** - Guía del panel de administrador
+```http
+# Obtener todas las reservas
+GET /api/bookings.php
 
----
+# Obtener reservas de una fecha
+GET /api/bookings.php?date=2025-01-10
 
-## 🌐 Despliegue
+# Crear reserva
+POST /api/bookings.php
+Content-Type: application/json
 
-### Servidor Local
-Simplemente abre los archivos HTML en tu navegador.
+{
+  "booking_date": "2025-01-10",
+  "slot_index": 0,
+  "time_slot": "15:15",
+  "chair": "rojo",
+  "patient_name": "Juan Pérez",
+  "patient_email": "juan.perez@alu.medac.es"
+}
 
-### Servidor Web
-Sube todos los archivos a tu servidor (Apache, Nginx, etc.)
+# Actualizar reserva (requiere autenticación)
+PUT /api/bookings.php
+Content-Type: application/json
 
-### GitHub Pages
-1. Sube los archivos a un repositorio
-2. Activa GitHub Pages en Settings
-3. Accede desde `https://tu-usuario.github.io/repo`
+{
+  "id": 1,
+  "patient_name": "Juan Pérez García",
+  "patient_email": "juan.perez@medac.es"
+}
 
-### Netlify
-Arrastra la carpeta completa a Netlify.
+# Eliminar por ID (requiere autenticación)
+DELETE /api/bookings.php?id=1
 
----
+# Eliminar por email
+DELETE /api/bookings.php?email=juan.perez@alu.medac.es
+```
 
 ## 🔒 Seguridad
 
-⚠️ **Importante**: Este sistema usa autenticación básica con clave en el código. Para producción, considera:
+- ✅ Contraseñas hasheadas (bcrypt)
+- ✅ Prepared statements (prevención SQL injection)
+- ✅ Validación de inputs
+- ✅ Sanitización de datos
+- ✅ Sesiones seguras
+- ✅ CORS configurado
+- ✅ Registro de auditoría
+- ✅ Validación de dominios de email
 
-- Implementar autenticación en servidor
-- Usar base de datos real (MySQL, PostgreSQL)
-- Añadir HTTPS
-- Implementar sesiones seguras
-- Hash de contraseñas
+## 🛠️ Configuración
+
+### Cambiar credenciales de BD
+
+Editar `api/config.php`:
+
+```php
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'higiene_reservas');
+define('DB_USER', 'root');
+define('DB_PASS', 'tu_contraseña');
+```
+
+### Cambiar dominios de email permitidos
+
+Editar `api/config.php`:
+
+```php
+define('ALLOWED_EMAIL_DOMAINS', ['alu.medac.es', 'medac.es', 'otro.es']);
+```
+
+### Cambiar horarios
+
+Editar `api/config.php`:
+
+```php
+define('START_HOUR', 15);
+define('START_MINUTE', 15);
+define('END_HOUR', 20);
+define('END_MINUTE', 30);
+define('SLOT_DURATION', 40); // minutos
+```
+
+## 📊 Base de Datos
+
+### Esquema Principal
+
+```sql
+-- Tabla de usuarios
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE,
+    password_hash VARCHAR(255),
+    email VARCHAR(100),
+    created_at TIMESTAMP
+);
+
+-- Tabla de reservas
+CREATE TABLE bookings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_date DATE,
+    slot_index INT,
+    time_slot VARCHAR(5),
+    chair ENUM('rojo', 'azul', 'amarillo'),
+    patient_name VARCHAR(100),
+    patient_email VARCHAR(100),
+    created_at TIMESTAMP,
+    UNIQUE KEY (booking_date, slot_index, chair)
+);
+
+-- Tabla de auditoría
+CREATE TABLE audit_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    action_type ENUM('CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT'),
+    table_name VARCHAR(50),
+    record_id INT,
+    user_id INT,
+    created_at TIMESTAMP
+);
+```
+
+## 🧪 Testing
+
+### Probar API con curl
+
+```bash
+# Login
+curl -X POST http://localhost/Limpiezas/api/auth.php?action=login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# Obtener reservas
+curl http://localhost/Limpiezas/api/bookings.php
+
+# Crear reserva
+curl -X POST http://localhost/Limpiezas/api/bookings.php \
+  -H "Content-Type: application/json" \
+  -d '{
+    "booking_date": "2025-01-10",
+    "slot_index": 0,
+    "time_slot": "15:15",
+    "chair": "rojo",
+    "patient_name": "Test User",
+    "patient_email": "test@alu.medac.es"
+  }'
+```
+
+## 📝 Mantenimiento
+
+### Backup automático
+
+Crear tarea programada para ejecutar:
+
+```bash
+mysqldump -u root higiene_reservas > backup_$(date +%Y%m%d).sql
+```
+
+### Limpiar reservas antiguas
+
+Ejecutar en phpMyAdmin:
+
+```sql
+CALL cleanup_old_bookings();
+```
+
+### Ver estadísticas
+
+```sql
+CALL get_statistics('2025-01-01', '2025-12-31');
+```
+
+## 🐛 Solución de Problemas
+
+Ver [DEPLOYMENT.md](DEPLOYMENT.md#-solución-de-problemas) para guía completa.
+
+## 📄 Licencia
+
+Proyecto educativo para el módulo de Diseño de Interfaces - MEDAC
+
+## 👨‍💻 Autor
+
+Desarrollado para prácticas de Higiene Bucodental - Instituto MEDAC
 
 ---
 
-## 🆘 Solución de Problemas
-
-**Los estilos no se cargan:**
-- Verifica que `styles.css` esté en la misma carpeta
-- Revisa la consola del navegador (F12)
-
-**El JavaScript no funciona:**
-- Verifica que `app.js` esté en la misma carpeta (para index.html)
-- Asegúrate de tener conexión a internet (Bootstrap, SheetJS)
-
-**Las reservas no se guardan:**
-- Verifica que localStorage esté habilitado
-- Evita modo incógnito/privado
-- Prueba en otro navegador
-
-**No aparecen viernes en el calendario:**
-- Los viernes pasados no son seleccionables
-- Navega a meses futuros con las flechas
-
----
-
-## 📱 Compatibilidad
-
-✅ Chrome 90+  
-✅ Firefox 88+  
-✅ Safari 14+  
-✅ Edge 90+  
-✅ Móviles (iOS Safari, Chrome Android)  
-
----
-
-## 🎓 Tecnologías Utilizadas
-
-- HTML5
-- CSS3 (Variables, Flexbox, Grid, Animaciones)
-- JavaScript ES6+
-- Bootstrap 5.3.2
-- SheetJS (xlsx.js)
-- Google Fonts (Inter)
-- localStorage API
-
----
-
-## 📝 Licencia
-
-Este proyecto es de uso educativo para el módulo de Higiene Bucodental.
-
----
-
-## ✨ Características Destacadas
-
-### Diseño Moderno
-- Gradientes azules corporativos
-- Animaciones suaves
-- Sombras elevadas
-- Responsive design
-
-### Calendario Inteligente
-- Solo viernes seleccionables
-- Navegación entre meses
-- Indicador de fechas con reservas
-- Fechas pasadas deshabilitadas
-
-### Sistema de Sillones
-- Tres colores distintivos
-- Estado visual claro
-- Nombres de pacientes visibles
-- Botones interactivos
-
-### Panel Profesional
-- Dashboard con métricas
-- Filtros en tiempo real
-- Edición completa
-- Exportación profesional
-
----
-
-## 🎯 Recomendaciones de Uso
-
-**Para Pacientes:**
-- Usa `index.html`
-- Marca como favorito
-- Guarda tu teléfono para cancelaciones
-
-**Para Administradores:**
-- Usa `admin.html` ⭐
-- Marca como favorito
-- Exporta a Excel semanalmente
-- Cambia la clave por defecto
-
-**Para Desarrollo:**
-- Archivos separados (HTML, CSS, JS)
-- Usa la consola del navegador para debug
-- Lee INSTRUCCIONES.md para personalizar
-
----
-
-## 📞 Soporte
-
-Para problemas o dudas:
-1. Revisa INSTRUCCIONES.md
-2. Consulta la consola del navegador (F12)
-3. Verifica que todos los archivos estén presentes
-4. Asegúrate de tener conexión a internet
-
----
-
-**¡Sistema listo para usar!** 🎉
-
-Última actualización: Diciembre 2025
+**Versión:** 2.0.0 (Backend PHP + MySQL)  
+**Última actualización:** Diciembre 2025
