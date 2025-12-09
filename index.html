@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reservas - Módulo Higiene Bucodental</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- SheetJS (para exportar Excel) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg brand p-3">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-3" href="#">
+        <!-- Logo: sonrisa (SVG) -->
+        <svg class="logo-smile" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="white" aria-hidden="true">
+          <circle cx="32" cy="32" r="30" opacity="0.12" />
+          <path d="M20 26c1.5-3 6-3 7.5 0" stroke="white" stroke-width="3" stroke-linecap="round" fill="none" />
+          <path d="M44 26c-1.5-3-6-3-7.5 0" stroke="white" stroke-width="3" stroke-linecap="round" fill="none" />
+          <path d="M20 38c6 6 18 6 24 0" stroke="white" stroke-width="3" stroke-linecap="round" fill="none" />
+        </svg>
+        <div>
+          <div class="fw-bold">Higiene Bucodental - Prácticas</div>
+          <small class="d-block">Reservas de pacientes · Davante</small>
+        </div>
+      </a>
+      <div class="ms-auto text-end">
+        <div class="badge bg-white text-dark p-2 rounded-pill">DAVANTE</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- NAVEGACIÓN ENTRE VISTAS -->
+  <div class="container mt-4">
+    <div class="view-toggle">
+      <button class="btn btn-outline-primary active" id="btnUserView">
+        👤 Vista de Usuario
+      </button>
+      <button class="btn btn-outline-primary" id="btnAdminView">
+        🔐 Modo Administrador
+      </button>
+    </div>
+  </div>
+
+  <!-- VISTA DE USUARIO -->
+  <main class="container my-4" id="userView">
+    <div class="row g-4">
+
+      <!-- CALENDARIO -->
+      <div class="col-lg-5">
+        <div class="card-modern p-4">
+          <h4 class="mb-4">📅 Selecciona un viernes</h4>
+          <div class="calendar-container">
+            <div class="calendar-header">
+              <button class="calendar-nav-btn" id="btnPrevMonth">‹</button>
+              <h5 id="currentMonth">Diciembre 2025</h5>
+              <button class="calendar-nav-btn" id="btnNextMonth">›</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+              <!-- Generado por JavaScript -->
+            </div>
+          </div>
+          <div class="alert alert-info-custom mt-3">
+            <strong>ℹ️ Información:</strong> Solo puedes reservar los viernes. Los horarios disponibles son de 15:15 a
+            20:30 en intervalos de 40 minutos.
+          </div>
+        </div>
+      </div>
+
+      <!-- HORARIOS Y RESERVAS -->
+      <div class="col-lg-7">
+        <div class="card-modern p-4">
+          <h4 class="mb-3">🕐 Horarios disponibles</h4>
+
+          <!-- Fecha seleccionada -->
+          <div class="alert alert-success-custom mb-4">
+            <strong>Fecha seleccionada:</strong> <span id="selectedDateDisplay">Ninguna fecha seleccionada</span>
+          </div>
+
+          <!-- Resumen de disponibilidad -->
+          <div class="row g-3 mb-4">
+            <div class="col-4">
+              <div class="stats-card">
+                <div class="stats-number" id="summaryTotal">0</div>
+                <div class="stats-label">Total plazas</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="stats-card">
+                <div class="stats-number" id="summaryTaken">0</div>
+                <div class="stats-label">Reservadas</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="stats-card">
+                <div class="stats-number" id="summaryAvailable">0</div>
+                <div class="stats-label">Disponibles</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slots de horarios -->
+          <div id="slotsSection">
+            <div id="slotsContainer" class="row gy-3">
+              <!-- Generado por JavaScript -->
+            </div>
+          </div>
+
+          <!-- Eliminar mi cita -->
+          <div class="card-modern p-3 mt-4">
+            <h6>❌ Cancelar mi cita</h6>
+            <p class="text-muted small mb-2">Introduce tu email para eliminar todas tus reservas</p>
+            <div class="input-group">
+              <input type="email" id="deleteEmail" class="form-control"
+                placeholder="Tu email (@alu.medac.es o @medac.es)">
+              <button class="btn btn-danger" id="btnDelete">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- VISTA DE ADMINISTRADOR -->
+  <main class="container my-4 hidden" id="adminView">
+    <div class="row g-4">
+
+      <!-- ESTADÍSTICAS -->
+      <div class="col-12">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="stats-card">
+              <div class="stats-number" id="statsTotalBookings">0</div>
+              <div class="stats-label">Total de Reservas</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="stats-card">
+              <div class="stats-number" id="statsTotalDates">0</div>
+              <div class="stats-label">Fechas con Reservas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLA DE RESERVAS -->
+      <div class="col-12">
+        <div class="card-modern p-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">📋 Todas las Reservas</h4>
+            <div class="d-flex gap-2">
+              <button class="btn btn-success" id="btnExport">📥 Exportar Excel</button>
+              <button class="btn btn-warning" id="btnResetDate">🗑️ Reset por Fecha</button>
+              <button class="btn btn-danger" id="btnResetAll">⚠️ Reset Total</button>
+            </div>
+          </div>
+
+          <div class="admin-table">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                  <th>Sillón</th>
+                  <th>Nombre</th>
+                  <th>Email</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableBody">
+                <!-- Generado por JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODAL: RESERVAR CITA -->
+  <div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">✅ Confirmar Reserva</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <form id="bookingForm">
+            <div class="mb-3">
+              <label class="form-label">🕐 Horario</label>
+              <input type="text" class="form-control" id="formTime" readonly>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">💺 Sillón</label>
+              <select class="form-select" id="formChair">
+                <option value="rojo">🔴 Rojo</option>
+                <option value="azul">🔵 Azul</option>
+                <option value="amarillo">🟡 Amarillo</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">👤 Nombre del paciente</label>
+              <input type="text" class="form-control" id="formName" required placeholder="Nombre completo">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">📧 Email</label>
+              <input type="email" class="form-control" id="formEmail" required
+                placeholder="email@alu.medac.es o email@medac.es">
+            </div>
+            <input type="hidden" id="formSlotIndex">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="confirmBooking">Confirmar Reserva</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR CITA (ADMIN) -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">✏️ Editar Cita</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editForm">
+            <div class="mb-3">
+              <label class="form-label">📅 Fecha</label>
+              <input type="text" class="form-control" id="editDate" readonly>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">🕐 Horario</label>
+              <input type="text" class="form-control" id="editTime" readonly>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">💺 Sillón</label>
+              <input type="text" class="form-control" id="editChair" readonly>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">👤 Nombre del paciente</label>
+              <input type="text" class="form-control" id="editName" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">📧 Email</label>
+              <input type="email" class="form-control" id="editEmail" required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="saveEditBooking">Guardar Cambios</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LOGIN ADMINISTRADOR -->
+  <div class="modal fade" id="adminLoginModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+    data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title">🔐 Acceso de Administrador</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted">Introduce la clave de administrador para acceder al panel de control.</p>
+          <div class="mb-3">
+            <label class="form-label">Clave de Acceso</label>
+            <input type="password" class="form-control form-control-lg" id="adminPasswordInput"
+              placeholder="Introduce la clave">
+            <div class="invalid-feedback" id="adminLoginError">
+              Clave incorrecta. Inténtalo de nuevo.
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="btnAdminLogin">Acceder</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JavaScript de la aplicación -->
+  <script src="app.js"></script>
+
+</body>
+
+</html>

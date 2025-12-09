@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Panel de Administrador - Higiene Bucodental</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- SheetJS (para exportar Excel) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        /* Estilos adicionales específicos del admin */
+        .admin-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+
+        .stat-card-admin {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 6px 20px rgba(11, 102, 214, 0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--brand-blue);
+        }
+
+        .stat-card-admin:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(11, 102, 214, 0.2);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            opacity: 0.2;
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .table-actions {
+            min-width: 200px;
+        }
+
+        .filter-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .booking-row {
+            transition: all 0.2s ease;
+        }
+
+        .booking-row:hover {
+            background: #f8fbff !important;
+            transform: scale(1.01);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER ADMIN -->
+    <header class="admin-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-2">🔐 Panel de Administrador</h1>
+                    <p class="mb-0 opacity-75">Gestión de Reservas - Higiene Bucodental</p>
+                </div>
+                <div>
+                    <span class="admin-badge">ADMIN</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="container my-5">
+
+        <!-- ESTADÍSTICAS -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="stat-card-admin position-relative">
+                    <div class="stat-icon">📊</div>
+                    <h6 class="text-muted text-uppercase small mb-2">Total Reservas</h6>
+                    <h2 class="mb-0 text-brand" id="statTotal">0</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-admin position-relative">
+                    <div class="stat-icon">📅</div>
+                    <h6 class="text-muted text-uppercase small mb-2">Fechas Activas</h6>
+                    <h2 class="mb-0 text-brand" id="statDates">0</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-admin position-relative">
+                    <div class="stat-icon">🔴</div>
+                    <h6 class="text-muted text-uppercase small mb-2">Sillón Rojo</h6>
+                    <h2 class="mb-0 text-danger" id="statRed">0</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-admin position-relative">
+                    <div class="stat-icon">🔵</div>
+                    <h6 class="text-muted text-uppercase small mb-2">Sillón Azul</h6>
+                    <h2 class="mb-0 text-primary" id="statBlue">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACCIONES PRINCIPALES -->
+        <div class="card-modern p-4 mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="mb-2">⚡ Acciones Rápidas</h5>
+                    <p class="text-muted mb-0 small">Gestiona todas las reservas desde aquí</p>
+                </div>
+                <div class="col-md-6">
+                    <div class="action-buttons justify-content-md-end">
+                        <button class="btn btn-success" id="btnExportExcel">
+                            📥 Exportar Excel
+                        </button>
+                        <button class="btn btn-warning" id="btnResetDate">
+                            🗑️ Reset por Fecha
+                        </button>
+                        <button class="btn btn-danger" id="btnResetAll">
+                            ⚠️ Reset Total
+                        </button>
+                        <a href="index.html" class="btn btn-outline-secondary">
+                            👤 Vista Usuario
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="filter-section">
+            <h6 class="mb-3">🔍 Filtros de Búsqueda</h6>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" class="form-control" id="filterName" placeholder="Buscar por nombre...">
+                </div>
+                <div class="col-md-3">
+                    <input type="tel" class="form-control" id="filterPhone" placeholder="Buscar por teléfono...">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="filterChair">
+                        <option value="">Todos los sillones</option>
+                        <option value="rojo">🔴 Rojo</option>
+                        <option value="azul">🔵 Azul</option>
+                        <option value="amarillo">🟡 Amarillo</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="date" class="form-control" id="filterDate" placeholder="Filtrar por fecha">
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLA DE RESERVAS -->
+        <div class="card-modern p-0">
+            <div class="card-header-custom">
+                📋 Todas las Reservas
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Sillón</th>
+                            <th>Nombre</th>
+                            <th>Teléfono</th>
+                            <th class="table-actions">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsTableBody">
+                        <!-- Generado por JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL: EDITAR RESERVA -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">✏️ Editar Reserva</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <div class="mb-3">
+                            <label class="form-label">📅 Fecha</label>
+                            <input type="date" class="form-control" id="editDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">🕐 Hora</label>
+                            <select class="form-select" id="editTime" required>
+                                <!-- Generado dinámicamente -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">💺 Sillón</label>
+                            <select class="form-select" id="editChair" required>
+                                <option value="rojo">🔴 Rojo</option>
+                                <option value="azul">🔵 Azul</option>
+                                <option value="amarillo">🟡 Amarillo</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">👤 Nombre del Paciente</label>
+                            <input type="text" class="form-control" id="editName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">📱 Teléfono</label>
+                            <input type="tel" class="form-control" id="editPhone" required>
+                        </div>
+                        <input type="hidden" id="editOriginalDate">
+                        <input type="hidden" id="editOriginalSlot">
+                        <input type="hidden" id="editOriginalChair">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnSaveEdit">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: AUTENTICACIÓN -->
+    <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+        data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title">🔐 Acceso de Administrador</h5>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted">Introduce la clave de administrador para acceder al panel de control.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Clave de Acceso</label>
+                        <input type="password" class="form-control form-control-lg" id="adminPassword"
+                            placeholder="Introduce la clave">
+                        <div class="invalid-feedback" id="authError">
+                            Clave incorrecta. Inténtalo de nuevo.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="index.html" class="btn btn-secondary">Cancelar</a>
+                    <button type="button" class="btn btn-primary" id="btnLogin">Acceder</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript del Panel Admin -->
+    <script>
+        // ============================================
+        // CONFIGURACIÓN
+        // ============================================
+        const CONFIG = {
+            ADMIN_PASSWORD: 'admin123',
+            STORAGE_KEY: 'bookings_v2',
+            CHAIRS: ['rojo', 'azul', 'amarillo'],
+            SLOT_DURATION_MIN: 40,
+            START_TIME: { h: 15, m: 15 },
+            END_TIME: { h: 20, m: 30 }
+        };
+
+        // ============================================
+        // ESTADO
+        // ============================================
+        let allBookings = [];
+        let filteredBookings = [];
+        let editModalInstance;
+        let authModalInstance;
+
+        // ============================================
+        // UTILIDADES
+        // ============================================
+        function minutes(h, m) {
+            return h * 60 + m;
+        }
+
+        function timeToStr(t) {
+            return String(t.h).padStart(2, '0') + ':' + String(t.m).padStart(2, '0');
+        }
+
+        function generateTimeSlots() {
+            const slots = [];
+            let curMin = minutes(CONFIG.START_TIME.h, CONFIG.START_TIME.m);
+            const endMin = minutes(CONFIG.END_TIME.h, CONFIG.END_TIME.m);
+
+            while (curMin + CONFIG.SLOT_DURATION_MIN <= endMin) {
+                const h = Math.floor(curMin / 60);
+                const m = curMin % 60;
+                slots.push({ h, m, str: timeToStr({ h, m }) });
+                curMin += CONFIG.SLOT_DURATION_MIN;
+            }
+
+            return slots;
+        }
+
+        function formatDateLong(dateStr) {
+            const [year, month, day] = dateStr.split('-').map(Number);
+            const date = new Date(year, month - 1, day);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('es-ES', options);
+        }
+
+        // ============================================
+        // GESTIÓN DE DATOS
+        // ============================================
+        function loadBookings() {
+            const data = localStorage.getItem(CONFIG.STORAGE_KEY);
+            if (data) {
+                try {
+                    const bookingsObj = JSON.parse(data);
+                    allBookings = [];
+
+                    Object.keys(bookingsObj).forEach(date => {
+                        bookingsObj[date].forEach(booking => {
+                            allBookings.push({ ...booking, date });
+                        });
+                    });
+
+                    allBookings.sort((a, b) => {
+                        if (a.date !== b.date) return a.date.localeCompare(b.date);
+                        return a.slotIndex - b.slotIndex;
+                    });
+
+                } catch (e) {
+                    console.error('Error loading bookings:', e);
+                    allBookings = [];
+                }
+            }
+            filteredBookings = [...allBookings];
+        }
+
+        function saveBookings() {
+            const bookingsObj = {};
+
+            allBookings.forEach(booking => {
+                if (!bookingsObj[booking.date]) {
+                    bookingsObj[booking.date] = [];
+                }
+                const { date, ...bookingData } = booking;
+                bookingsObj[booking.date].push(bookingData);
+            });
+
+            localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(bookingsObj));
+        }
+
+        function deleteBooking(date, slotIndex, chair) {
+            allBookings = allBookings.filter(
+                b => !(b.date === date && b.slotIndex === slotIndex && b.chair === chair)
+            );
+            saveBookings();
+            loadBookings();
+            applyFilters();
+            renderBookings();
+            updateStats();
+        }
+
+        function updateBooking(originalDate, originalSlot, originalChair, newBooking) {
+            const index = allBookings.findIndex(
+                b => b.date === originalDate && b.slotIndex === originalSlot && b.chair === originalChair
+            );
+
+            if (index !== -1) {
+                allBookings[index] = newBooking;
+                saveBookings();
+                loadBookings();
+                applyFilters();
+                renderBookings();
+                updateStats();
+            }
+        }
+
+        // ============================================
+        // FILTROS
+        // ============================================
+        function applyFilters() {
+            const nameFilter = document.getElementById('filterName').value.toLowerCase();
+            const phoneFilter = document.getElementById('filterPhone').value.toLowerCase();
+            const chairFilter = document.getElementById('filterChair').value;
+            const dateFilter = document.getElementById('filterDate').value;
+
+            filteredBookings = allBookings.filter(booking => {
+                const matchName = !nameFilter || booking.name.toLowerCase().includes(nameFilter);
+                const matchPhone = !phoneFilter || booking.phone.toLowerCase().includes(phoneFilter);
+                const matchChair = !chairFilter || booking.chair === chairFilter;
+                const matchDate = !dateFilter || booking.date === dateFilter;
+
+                return matchName && matchPhone && matchChair && matchDate;
+            });
+
+            renderBookings();
+        }
+
+        // ============================================
+        // RENDERIZADO
+        // ============================================
+        function renderBookings() {
+            const tbody = document.getElementById('bookingsTableBody');
+            tbody.innerHTML = '';
+
+            if (filteredBookings.length === 0) {
+                tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty-state">
+          <div class="empty-state-icon">📭</div>
+          <h5>No hay reservas</h5>
+          <p class="text-muted">No se encontraron reservas con los filtros aplicados.</p>
+        </td>
+      </tr>
+    `;
+                return;
+            }
+
+            filteredBookings.forEach(booking => {
+                const tr = document.createElement('tr');
+                tr.className = 'booking-row';
+
+                const chairBadgeClass = booking.chair === 'rojo' ? 'bg-danger' :
+                    booking.chair === 'azul' ? 'bg-primary' : 'bg-warning';
+
+                tr.innerHTML = `
+      <td><strong>${formatDateLong(booking.date)}</strong></td>
+      <td><span class="badge bg-secondary">${booking.time}</span></td>
+      <td><span class="badge ${chairBadgeClass}">${booking.chair.charAt(0).toUpperCase() + booking.chair.slice(1)}</span></td>
+      <td>${booking.name}</td>
+      <td>${booking.phone}</td>
+      <td class="table-actions">
+        <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('${booking.date}', ${booking.slotIndex}, '${booking.chair}')">
+          ✏️ Editar
+        </button>
+        <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('${booking.date}', ${booking.slotIndex}, '${booking.chair}')">
+          🗑️ Eliminar
+        </button>
+      </td>
+    `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('statTotal').textContent = allBookings.length;
+
+            const uniqueDates = new Set(allBookings.map(b => b.date));
+            document.getElementById('statDates').textContent = uniqueDates.size;
+
+            const redCount = allBookings.filter(b => b.chair === 'rojo').length;
+            const blueCount = allBookings.filter(b => b.chair === 'azul').length;
+
+            document.getElementById('statRed').textContent = redCount;
+            document.getElementById('statBlue').textContent = blueCount;
+        }
+
+        // ============================================
+        // MODAL DE EDICIÓN
+        // ============================================
+        function openEditModal(date, slotIndex, chair) {
+            const booking = allBookings.find(
+                b => b.date === date && b.slotIndex === slotIndex && b.chair === chair
+            );
+
+            if (!booking) return;
+
+            // Rellenar formulario
+            document.getElementById('editDate').value = date;
+            document.getElementById('editChair').value = chair;
+            document.getElementById('editName').value = booking.name;
+            document.getElementById('editPhone').value = booking.phone;
+
+            // Guardar valores originales
+            document.getElementById('editOriginalDate').value = date;
+            document.getElementById('editOriginalSlot').value = slotIndex;
+            document.getElementById('editOriginalChair').value = chair;
+
+            // Generar opciones de horarios
+            const timeSelect = document.getElementById('editTime');
+            timeSelect.innerHTML = '';
+            const slots = generateTimeSlots();
+            slots.forEach((slot, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = slot.str;
+                if (index === slotIndex) option.selected = true;
+                timeSelect.appendChild(option);
+            });
+
+            editModalInstance.show();
+        }
+
+        function saveEdit() {
+            const originalDate = document.getElementById('editOriginalDate').value;
+            const originalSlot = parseInt(document.getElementById('editOriginalSlot').value);
+            const originalChair = document.getElementById('editOriginalChair').value;
+
+            const newDate = document.getElementById('editDate').value;
+            const newSlotIndex = parseInt(document.getElementById('editTime').value);
+            const newChair = document.getElementById('editChair').value;
+            const newName = document.getElementById('editName').value.trim();
+            const newPhone = document.getElementById('editPhone').value.trim();
+
+            if (!newName || !newPhone || !newDate) {
+                alert('Por favor, completa todos los campos.');
+                return;
+            }
+
+            const slots = generateTimeSlots();
+            const newTime = slots[newSlotIndex].str;
+
+            const newBooking = {
+                date: newDate,
+                slotIndex: newSlotIndex,
+                chair: newChair,
+                name: newName,
+                phone: newPhone,
+                time: newTime
+            };
+
+            updateBooking(originalDate, originalSlot, originalChair, newBooking);
+            editModalInstance.hide();
+
+            alert('Reserva actualizada correctamente.');
+        }
+
+        // ============================================
+        // ELIMINAR
+        // ============================================
+        function confirmDelete(date, slotIndex, chair) {
+            const booking = allBookings.find(
+                b => b.date === date && b.slotIndex === slotIndex && b.chair === chair
+            );
+
+            if (!booking) return;
+
+            if (confirm(`¿Eliminar la reserva de ${booking.name} para el ${formatDateLong(date)} a las ${booking.time}?`)) {
+                deleteBooking(date, slotIndex, chair);
+                alert('Reserva eliminada correctamente.');
+            }
+        }
+
+        // ============================================
+        // EXPORTAR EXCEL
+        // ============================================
+        function exportToExcel() {
+            if (allBookings.length === 0) {
+                alert('No hay reservas para exportar.');
+                return;
+            }
+
+            const rows = allBookings.map(b => ({
+                Fecha: formatDateLong(b.date),
+                Hora: b.time,
+                Sillón: b.chair.charAt(0).toUpperCase() + b.chair.slice(1),
+                Nombre: b.name,
+                Teléfono: b.phone
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Reservas');
+            XLSX.writeFile(wb, `reservas_admin_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        // ============================================
+        // RESET
+        // ============================================
+        function resetAll() {
+            if (!confirm('⚠️ ¿Estás seguro de que quieres eliminar TODAS las reservas? Esta acción no se puede deshacer.')) {
+                return;
+            }
+
+            localStorage.removeItem(CONFIG.STORAGE_KEY);
+            allBookings = [];
+            filteredBookings = [];
+            renderBookings();
+            updateStats();
+
+            alert('Todas las reservas han sido eliminadas.');
+        }
+
+        function resetByDate() {
+            const date = prompt('Introduce la fecha a resetear (formato: YYYY-MM-DD, ejemplo: 2025-01-10):');
+
+            if (!date) return;
+
+            const bookingsForDate = allBookings.filter(b => b.date === date);
+
+            if (bookingsForDate.length === 0) {
+                alert('No hay reservas para esa fecha.');
+                return;
+            }
+
+            if (!confirm(`¿Eliminar todas las ${bookingsForDate.length} reserva(s) del ${formatDateLong(date)}?`)) {
+                return;
+            }
+
+            allBookings = allBookings.filter(b => b.date !== date);
+            saveBookings();
+            loadBookings();
+            applyFilters();
+            renderBookings();
+            updateStats();
+
+            alert('Reservas eliminadas correctamente.');
+        }
+
+        // ============================================
+        // AUTENTICACIÓN
+        // ============================================
+        function checkAuth() {
+            const password = document.getElementById('adminPassword').value;
+            const errorDiv = document.getElementById('authError');
+
+            if (password === CONFIG.ADMIN_PASSWORD) {
+                authModalInstance.hide();
+                document.getElementById('adminPassword').classList.remove('is-invalid');
+                initializeAdmin();
+            } else {
+                document.getElementById('adminPassword').classList.add('is-invalid');
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function initializeAdmin() {
+            loadBookings();
+            renderBookings();
+            updateStats();
+        }
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar modales
+            editModalInstance = new bootstrap.Modal(document.getElementById('editModal'));
+            authModalInstance = new bootstrap.Modal(document.getElementById('authModal'));
+
+            // Mostrar modal de autenticación
+            authModalInstance.show();
+
+            // Event listeners
+            document.getElementById('btnLogin').addEventListener('click', checkAuth);
+            document.getElementById('adminPassword').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkAuth();
+            });
+
+            document.getElementById('btnSaveEdit').addEventListener('click', saveEdit);
+            document.getElementById('btnExportExcel').addEventListener('click', exportToExcel);
+            document.getElementById('btnResetAll').addEventListener('click', resetAll);
+            document.getElementById('btnResetDate').addEventListener('click', resetByDate);
+
+            // Filtros
+            document.getElementById('filterName').addEventListener('input', applyFilters);
+            document.getElementById('filterPhone').addEventListener('input', applyFilters);
+            document.getElementById('filterChair').addEventListener('change', applyFilters);
+            document.getElementById('filterDate').addEventListener('change', applyFilters);
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,666 @@
+/* ============================================
+   VARIABLES Y TEMA CORPORATIVO
+   ============================================ */
+:root {
+  --brand-blue: #0b66d6;
+  --brand-blue-dark: #094fa8;
+  --brand-blue-light: #3d8ae6;
+  --brand-gradient: linear-gradient(135deg, #0b66d6 0%, #1877f2 100%);
+  
+  --chair-red: #e74c3c;
+  --chair-red-hover: #c0392b;
+  --chair-blue: #0b66d6;
+  --chair-blue-hover: #094fa8;
+  --chair-yellow: #f1c40f;
+  --chair-yellow-hover: #d4a809;
+  
+  --bg-light: #f8fbff;
+  --bg-white: #ffffff;
+  --text-dark: #052237;
+  --text-muted: #6c757d;
+  --border-color: #e0e7ff;
+  
+  --shadow-sm: 0 2px 8px rgba(11, 102, 214, 0.08);
+  --shadow-md: 0 6px 18px rgba(11, 102, 214, 0.12);
+  --shadow-lg: 0 10px 25px rgba(11, 102, 214, 0.15);
+  --shadow-xl: 0 20px 40px rgba(11, 102, 214, 0.2);
+  
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --border-radius: 1rem;
+  --border-radius-sm: 0.5rem;
+}
+
+/* ============================================
+   ESTILOS GLOBALES
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-light);
+  color: var(--text-dark);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ============================================
+   NAVBAR
+   ============================================ */
+.navbar.brand {
+  background: var(--brand-gradient);
+  color: white;
+  box-shadow: var(--shadow-md);
+  padding: 1rem 0;
+}
+
+.navbar-brand {
+  transition: var(--transition);
+}
+
+.navbar-brand:hover {
+  transform: translateY(-2px);
+}
+
+.logo-smile {
+  width: 64px;
+  height: 64px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  transition: var(--transition);
+}
+
+.logo-smile:hover {
+  transform: rotate(5deg) scale(1.05);
+}
+
+/* ============================================
+   TARJETAS MODERNAS
+   ============================================ */
+.card-modern {
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  border: none;
+  background: var(--bg-white);
+  transition: var(--transition);
+  overflow: hidden;
+}
+
+.card-modern:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.card-header-custom {
+  background: var(--brand-gradient);
+  color: white;
+  padding: 1.5rem;
+  border: none;
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
+.btn {
+  border-radius: var(--border-radius-sm);
+  padding: 0.625rem 1.25rem;
+  font-weight: 500;
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--brand-gradient);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, #094fa8 0%, #1566d6 100%);
+}
+
+.btn-outline-primary {
+  border: 2px solid var(--brand-blue);
+  color: var(--brand-blue);
+  background: transparent;
+}
+
+.btn-outline-primary:hover {
+  background: var(--brand-blue);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   SILLONES (CHAIRS)
+   ============================================ */
+.chair {
+  border-radius: var(--border-radius-sm);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  transition: var(--transition);
+  border: none;
+  box-shadow: var(--shadow-sm);
+  min-width: 140px;
+  text-align: center;
+}
+
+.chair.red {
+  background: var(--chair-red);
+  color: white;
+}
+
+.chair.red:hover:not(:disabled) {
+  background: var(--chair-red-hover);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.chair.blue {
+  background: var(--chair-blue);
+  color: white;
+}
+
+.chair.blue:hover:not(:disabled) {
+  background: var(--chair-blue-hover);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.chair.yellow {
+  background: var(--chair-yellow);
+  color: var(--text-dark);
+}
+
+.chair.yellow:hover:not(:disabled) {
+  background: var(--chair-yellow-hover);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.chair:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ============================================
+   CALENDARIO
+   ============================================ */
+.calendar-container {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.calendar-header h5 {
+  color: var(--brand-blue);
+  font-weight: 700;
+  margin: 0;
+}
+
+.calendar-nav-btn {
+  background: var(--brand-blue);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.calendar-nav-btn:hover {
+  background: var(--brand-blue-dark);
+  transform: scale(1.1);
+  box-shadow: var(--shadow-md);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.calendar-day-header {
+  text-align: center;
+  font-weight: 700;
+  color: var(--brand-blue);
+  padding: 0.75rem 0;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 500;
+  background: var(--bg-light);
+  color: var(--text-dark);
+  border: 2px solid transparent;
+}
+
+.calendar-day:hover:not(.disabled):not(.other-month) {
+  background: var(--brand-blue-light);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: var(--shadow-md);
+}
+
+.calendar-day.friday {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-color: var(--brand-blue);
+  font-weight: 700;
+}
+
+.calendar-day.friday:hover {
+  background: var(--brand-blue);
+  color: white;
+}
+
+.calendar-day.selected {
+  background: var(--brand-gradient);
+  color: white;
+  box-shadow: var(--shadow-md);
+  transform: scale(1.05);
+}
+
+.calendar-day.disabled {
+  background: #f0f0f0;
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.calendar-day.other-month {
+  color: #ccc;
+  background: transparent;
+}
+
+.calendar-day.has-bookings::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 6px;
+  height: 6px;
+  background: var(--chair-red);
+  border-radius: 50%;
+}
+
+/* ============================================
+   SLOTS DE HORARIOS
+   ============================================ */
+.slot-card {
+  background: white;
+  border-radius: var(--border-radius-sm);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  border-left: 4px solid var(--brand-blue);
+}
+
+.slot-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateX(4px);
+}
+
+.slot-time {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--brand-blue);
+  margin-bottom: 0.5rem;
+}
+
+.slot-duration {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.chairs-container {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   TABLA DE ADMINISTRADOR
+   ============================================ */
+.admin-table {
+  background: white;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.admin-table table {
+  margin: 0;
+}
+
+.admin-table thead {
+  background: var(--brand-gradient);
+  color: white;
+}
+
+.admin-table thead th {
+  font-weight: 600;
+  padding: 1rem;
+  border: none;
+}
+
+.admin-table tbody tr {
+  transition: var(--transition);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.admin-table tbody tr:hover {
+  background: var(--bg-light);
+  transform: scale(1.01);
+}
+
+.admin-table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+/* ============================================
+   BADGES Y ETIQUETAS
+   ============================================ */
+.badge-chair {
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-block;
+}
+
+.badge-chair.red {
+  background: var(--chair-red);
+  color: white;
+}
+
+.badge-chair.blue {
+  background: var(--chair-blue);
+  color: white;
+}
+
+.badge-chair.yellow {
+  background: var(--chair-yellow);
+  color: var(--text-dark);
+}
+
+/* ============================================
+   ALERTAS PERSONALIZADAS
+   ============================================ */
+.alert-custom {
+  border-radius: var(--border-radius-sm);
+  border: none;
+  padding: 1rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.alert-info-custom {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  color: var(--brand-blue-dark);
+  border-left: 4px solid var(--brand-blue);
+}
+
+.alert-success-custom {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  color: #2e7d32;
+  border-left: 4px solid #4caf50;
+}
+
+/* ============================================
+   MODALES
+   ============================================ */
+.modal-content {
+  border-radius: var(--border-radius);
+  border: none;
+  box-shadow: var(--shadow-xl);
+}
+
+.modal-header {
+  background: var(--brand-gradient);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+  padding: 1.5rem;
+}
+
+.modal-header .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.modal-footer {
+  border: none;
+  padding: 1rem 2rem 2rem;
+}
+
+/* ============================================
+   FORMULARIOS
+   ============================================ */
+.form-control, .form-select {
+  border-radius: var(--border-radius-sm);
+  border: 2px solid var(--border-color);
+  padding: 0.75rem 1rem;
+  transition: var(--transition);
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 0.25rem rgba(11, 102, 214, 0.15);
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 0.5rem;
+}
+
+/* ============================================
+   NAVEGACIÓN DE VISTAS
+   ============================================ */
+.view-toggle {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.view-toggle .btn {
+  flex: 1;
+  padding: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.view-toggle .btn.active {
+  background: var(--brand-gradient);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.4s ease-out;
+}
+
+/* ============================================
+   UTILIDADES
+   ============================================ */
+.text-brand {
+  color: var(--brand-blue);
+}
+
+.bg-brand {
+  background: var(--brand-gradient);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.visible {
+  display: block !important;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .calendar-grid {
+    gap: 0.25rem;
+  }
+  
+  .calendar-day {
+    font-size: 0.875rem;
+  }
+  
+  .chairs-container {
+    flex-direction: column;
+  }
+  
+  .chair {
+    width: 100%;
+  }
+  
+  .view-toggle {
+    flex-direction: column;
+  }
+  
+  .admin-table {
+    overflow-x: auto;
+  }
+  
+  .slot-card {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar-brand {
+    font-size: 0.875rem;
+  }
+  
+  .logo-smile {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .card-modern {
+    padding: 1rem !important;
+  }
+  
+  .calendar-day-header {
+    font-size: 0.75rem;
+    padding: 0.5rem 0;
+  }
+}
+
+/* ============================================
+   ESTADÍSTICAS
+   ============================================ */
+.stats-card {
+  background: white;
+  border-radius: var(--border-radius-sm);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+  transition: var(--transition);
+}
+
+.stats-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+}
+
+.stats-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--brand-blue);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.stats-label {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+/* ============================================
+   LOADING SPINNER
+   ============================================ */
+.spinner {
+  border: 3px solid var(--border-color);
+  border-top: 3px solid var(--brand-blue);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 2rem auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
