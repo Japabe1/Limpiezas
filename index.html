@@ -42,23 +42,23 @@
           <small class="d-block">Reservas de pacientes · Davante</small>
         </div>
       </a>
-      <div class="ms-auto text-end">
-        <div class="badge bg-white text-dark p-2 rounded-pill">DAVANTE</div>
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <!-- Información de usuario logueado (oculto por defecto) -->
+        <div id="userInfo" class="text-white hidden">
+          <small>👤 <span id="loggedUsername"></span></small>
+        </div>
+        <!-- Botón de Login/Logout -->
+        <button class="btn btn-light" id="btnLogin">
+          🔐 Iniciar Sesión
+        </button>
+        <button class="btn btn-outline-light hidden" id="btnLogout">
+          🚪 Cerrar Sesión
+        </button>
       </div>
     </div>
   </nav>
 
-  <!-- NAVEGACIÓN ENTRE VISTAS -->
-  <div class="container mt-4">
-    <div class="view-toggle">
-      <button class="btn btn-outline-primary active" id="btnUserView">
-        👤 Vista de Usuario
-      </button>
-      <button class="btn btn-outline-primary" id="btnAdminView">
-        🔐 Modo Administrador
-      </button>
-    </div>
-  </div>
+
 
   <!-- VISTA DE USUARIO -->
   <main class="container my-4" id="userView">

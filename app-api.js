@@ -207,18 +207,27 @@ function getAllBookings() {
 function switchView(view) {
     AppState.currentView = view;
 
-    document.getElementById('btnUserView').classList.toggle('active', view === 'user');
-    document.getElementById('btnAdminView').classList.toggle('active', view === 'admin');
-
     document.getElementById('userView').classList.toggle('hidden', view !== 'user');
     document.getElementById('adminView').classList.toggle('hidden', view !== 'admin');
 
     if (view === 'admin') {
-        if (!AppState.isAdminAuthenticated) {
-            showAdminLogin();
-        } else {
-            renderAdminPanel();
-        }
+        renderAdminPanel();
+    }
+}
+
+function updateUIForAuthState() {
+    const isAuthenticated = AppState.isAdminAuthenticated;
+
+    // Mostrar/ocultar botones de login/logout
+    document.getElementById('btnLogin').classList.toggle('hidden', isAuthenticated);
+    document.getElementById('btnLogout').classList.toggle('hidden', !isAuthenticated);
+
+    // Mostrar/ocultar info de usuario
+    document.getElementById('userInfo').classList.toggle('hidden', !isAuthenticated);
+
+    if (isAuthenticated) {
+        // Mostrar nombre de usuario (puedes obtenerlo del estado si lo guardas)
+        document.getElementById('loggedUsername').textContent = 'Administrador';
     }
 }
 
@@ -248,8 +257,13 @@ async function attemptAdminLogin() {
         const response = await login(username, password);
         AppState.isAdminAuthenticated = true;
         adminLoginModalInstance.hide();
-        await loadBookings(); // Cargar todas las reservas
-        renderAdminPanel();
+
+        // Actualizar UI
+        updateUIForAuthState();
+
+        // Cargar todas las reservas y cambiar a vista admin
+        await loadBookings();
+        switchView('admin');
     } catch (error) {
         document.getElementById('adminPasswordInput').classList.add('is-invalid');
         document.getElementById('adminLoginUsername').classList.add('is-invalid');
@@ -260,6 +274,11 @@ async function handleLogout() {
     try {
         await logout();
         AppState.isAdminAuthenticated = false;
+
+        // Actualizar UI
+        updateUIForAuthState();
+
+        // Volver a vista de usuario
         switchView('user');
     } catch (error) {
         console.error('Logout error:', error);
@@ -390,10 +409,17 @@ function renderSlots() {
         const chairsDiv = document.createElement('div');
         chairsDiv.className = 'chairs-container';
 
+        // Mapeo de nombres de sillones a clases CSS de colores
+        const chairColorClass = {
+            'rojo': 'red',
+            'azul': 'blue',
+            'amarillo': 'yellow'
+        };
+
         CONFIG.CHAIRS.forEach(chair => {
             const booking = slot.chairs[chair];
             const btn = document.createElement('button');
-            btn.className = 'btn chair ' + chair;
+            btn.className = 'btn chair ' + chairColorClass[chair];
 
             if (booking) {
                 btn.innerHTML = `<strong>${chair.charAt(0).toUpperCase() + chair.slice(1)}</strong><br><small>${booking.patient_name}</small>`;
@@ -950,9 +976,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     editModalInstance = new bootstrap.Modal(document.getElementById('editModal'));
     adminLoginModalInstance = new bootstrap.Modal(document.getElementById('adminLoginModal'));
 
-    // Event listeners - Navegación
-    document.getElementById('btnUserView').addEventListener('click', () => switchView('user'));
-    document.getElementById('btnAdminView').addEventListener('click', () => switchView('admin'));
+    // Event listeners - Navegación y Autenticación
+    document.getElementById('btnLogin').addEventListener('click', showAdminLogin);
+    document.getElementById('btnLogout').addEventListener('click', handleLogout);
 
     // Event listeners - Calendario
     document.getElementById('btnPrevMonth').addEventListener('click', () => changeMonth(-1));
@@ -977,9 +1003,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Event listener - Modal close
     document.getElementById('adminLoginModal').addEventListener('hidden.bs.modal', () => {
-        if (!AppState.isAdminAuthenticated) {
-            switchView('user');
-        }
+        // No hacer nada especial al cerrar el modal
     });
 
     // Cargar reservas iniciales
@@ -988,5 +1012,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Renderizado inicial
     renderCalendar();
     renderSlots();
+
+    // Inicializar UI de autenticación
+    updateUIForAuthState();
+
+    // Vista inicial siempre es usuario
     switchView('user');
 });
