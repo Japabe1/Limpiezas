@@ -209,6 +209,7 @@ function switchView(view) {
 
     document.getElementById('userView').classList.toggle('hidden', view !== 'user');
     document.getElementById('adminView').classList.toggle('hidden', view !== 'admin');
+    document.getElementById('recommendationsSection').classList.toggle('hidden', view !== 'user');
 
     if (view === 'admin') {
         renderAdminPanel();
@@ -559,7 +560,7 @@ async function renderAdminPanel() {
     tbody.innerHTML = '';
 
     if (allBookings.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay reservas registradas</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No hay reservas registradas</td></tr>';
         updateAdminStats();
         return;
     }
@@ -571,25 +572,54 @@ async function renderAdminPanel() {
         'amarillo': 'yellow'
     };
 
-    allBookings.forEach((booking) => {
-        const tr = document.createElement('tr');
-        const colorClass = chairColorClass[booking.chair] || booking.chair;
-        tr.innerHTML = `
-      <td><strong>${formatDateLong(booking.booking_date)}</strong></td>
-      <td>${booking.time_slot}</td>
-      <td><span class="badge-chair ${colorClass}">${booking.chair.charAt(0).toUpperCase() + booking.chair.slice(1)}</span></td>
-      <td>${booking.patient_name}</td>
-      <td>${booking.patient_email}</td>
-      <td>
-        <button class="btn btn-sm btn-outline-primary" onclick="editBooking(${booking.id})">
-          Editar
-        </button>
-        <button class="btn btn-sm btn-outline-danger" onclick="deleteBookingAdmin(${booking.id})">
-          Eliminar
-        </button>
-      </td>
-    `;
-        tbody.appendChild(tr);
+    // Agrupar reservas por fecha
+    const bookingsByDate = {};
+    allBookings.forEach(booking => {
+        if (!bookingsByDate[booking.booking_date]) {
+            bookingsByDate[booking.booking_date] = [];
+        }
+        bookingsByDate[booking.booking_date].push(booking);
+    });
+
+    // Renderizar cada grupo de fecha
+    Object.keys(bookingsByDate).sort().forEach((date, dateIndex) => {
+        const bookingsForDate = bookingsByDate[date];
+
+        // Fila de encabezado de fecha
+        const dateHeaderRow = document.createElement('tr');
+        dateHeaderRow.className = 'date-separator-row';
+        dateHeaderRow.innerHTML = `
+            <td colspan="5" class="date-separator">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <strong>📅 ${formatDateLong(date)}</strong>
+                        <span class="badge bg-primary ms-2">${bookingsForDate.length} reserva${bookingsForDate.length !== 1 ? 's' : ''}</span>
+                    </div>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(dateHeaderRow);
+
+        // Filas de reservas para esta fecha
+        bookingsForDate.forEach((booking) => {
+            const tr = document.createElement('tr');
+            const colorClass = chairColorClass[booking.chair] || booking.chair;
+            tr.innerHTML = `
+                <td>${booking.time_slot}</td>
+                <td><span class="badge-chair ${colorClass}">${booking.chair.charAt(0).toUpperCase() + booking.chair.slice(1)}</span></td>
+                <td>${booking.patient_name}</td>
+                <td>${booking.patient_email}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="editBooking(${booking.id})">
+                        Editar
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteBookingAdmin(${booking.id})">
+                        Eliminar
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
     });
 
     updateAdminStats();

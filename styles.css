@@ -6,25 +6,25 @@
   --brand-blue-dark: #094fa8;
   --brand-blue-light: #3d8ae6;
   --brand-gradient: linear-gradient(135deg, #0b66d6 0%, #1877f2 100%);
-  
+
   --chair-red: #e74c3c;
   --chair-red-hover: #c0392b;
   --chair-blue: #0b66d6;
   --chair-blue-hover: #094fa8;
   --chair-yellow: #f1c40f;
   --chair-yellow-hover: #d4a809;
-  
+
   --bg-light: #f8fbff;
   --bg-white: #ffffff;
   --text-dark: #052237;
   --text-muted: #6c757d;
   --border-color: #e0e7ff;
-  
+
   --shadow-sm: 0 2px 8px rgba(11, 102, 214, 0.08);
   --shadow-md: 0 6px 18px rgba(11, 102, 214, 0.12);
   --shadow-lg: 0 10px 25px rgba(11, 102, 214, 0.15);
   --shadow-xl: 0 20px 40px rgba(11, 102, 214, 0.2);
-  
+
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --border-radius: 1rem;
   --border-radius-sm: 0.5rem;
@@ -389,6 +389,28 @@ body {
   vertical-align: middle;
 }
 
+/* Separadores de fecha en tabla admin */
+.date-separator-row {
+  background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+}
+
+.date-separator-row:hover {
+  background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%) !important;
+  transform: none !important;
+}
+
+.date-separator {
+  padding: 1.25rem 1rem !important;
+  font-size: 1.1rem;
+  border-top: 2px solid var(--brand-blue);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.date-separator strong {
+  color: var(--brand-blue);
+}
+
+
 /* ============================================
    BADGES Y ETIQUETAS
    ============================================ */
@@ -470,14 +492,16 @@ body {
 /* ============================================
    FORMULARIOS
    ============================================ */
-.form-control, .form-select {
+.form-control,
+.form-select {
   border-radius: var(--border-radius-sm);
   border: 2px solid var(--border-color);
   padding: 0.75rem 1rem;
   transition: var(--transition);
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
   border-color: var(--brand-blue);
   box-shadow: 0 0 0 0.25rem rgba(11, 102, 214, 0.15);
 }
@@ -518,6 +542,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -533,6 +558,7 @@ body {
     opacity: 0;
     transform: translateX(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -569,27 +595,27 @@ body {
   .calendar-grid {
     gap: 0.25rem;
   }
-  
+
   .calendar-day {
     font-size: 0.875rem;
   }
-  
+
   .chairs-container {
     flex-direction: column;
   }
-  
+
   .chair {
     width: 100%;
   }
-  
+
   .view-toggle {
     flex-direction: column;
   }
-  
+
   .admin-table {
     overflow-x: auto;
   }
-  
+
   .slot-card {
     padding: 1rem;
   }
@@ -599,16 +625,16 @@ body {
   .navbar-brand {
     font-size: 0.875rem;
   }
-  
+
   .logo-smile {
     width: 48px;
     height: 48px;
   }
-  
+
   .card-modern {
     padding: 1rem !important;
   }
-  
+
   .calendar-day-header {
     font-size: 0.75rem;
     padding: 0.5rem 0;
@@ -661,6 +687,11 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
