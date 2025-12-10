@@ -115,6 +115,18 @@ function handlePost($db) {
         sendError('Email inválido. Debe ser @alu.medac.es o @medac.es', 400);
     }
     
+    // Verificar si el email ya tiene una reserva en esta fecha
+    $checkEmailSql = "SELECT id FROM bookings 
+                      WHERE booking_date = :date AND patient_email = :email";
+    $existingEmail = $db->fetchOne($checkEmailSql, [
+        ':date' => $bookingDate,
+        ':email' => $patientEmail
+    ]);
+    
+    if ($existingEmail) {
+        sendError('Este email ya tiene una reserva para esta fecha', 409);
+    }
+    
     // Verificar disponibilidad
     $checkSql = "SELECT id FROM bookings 
                  WHERE booking_date = :date AND slot_index = :slot AND chair = :chair";
