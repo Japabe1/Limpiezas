@@ -564,12 +564,20 @@ async function renderAdminPanel() {
         return;
     }
 
+    // Mapeo de nombres de sillones a clases CSS de colores
+    const chairColorClass = {
+        'rojo': 'red',
+        'azul': 'blue',
+        'amarillo': 'yellow'
+    };
+
     allBookings.forEach((booking) => {
         const tr = document.createElement('tr');
+        const colorClass = chairColorClass[booking.chair] || booking.chair;
         tr.innerHTML = `
       <td><strong>${formatDateLong(booking.booking_date)}</strong></td>
       <td>${booking.time_slot}</td>
-      <td><span class="badge-chair ${booking.chair}">${booking.chair.charAt(0).toUpperCase() + booking.chair.slice(1)}</span></td>
+      <td><span class="badge-chair ${colorClass}">${booking.chair.charAt(0).toUpperCase() + booking.chair.slice(1)}</span></td>
       <td>${booking.patient_name}</td>
       <td>${booking.patient_email}</td>
       <td>
